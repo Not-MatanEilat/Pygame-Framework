@@ -2,6 +2,10 @@ import pygame
 import Colors
 from Mouse import Mouse
 from Keyboard import Keyboard
+from UI import Button
+from UI import Image
+from UI import EditText
+from UI import Text
 
 
 
@@ -23,6 +27,7 @@ class Game:
         self.player = Player(self.game_scroll, 50, 50, 50, 50)
         self.mouse = Mouse()
         self.keyboard = Keyboard()
+        self.UI = Ui_Manager(self)
 
         self.camera.follow(self.player)
 
@@ -34,6 +39,7 @@ class Game:
         self.player.draw(self.screen)
         self.test1.draw(self.screen)
         self.test2.draw(self.screen)
+        self.UI.draw(self.screen)
         pygame.display.flip()
 
     def run(self):
@@ -47,6 +53,7 @@ class Game:
             self.mouse.update(events)
             self.keyboard.update()
             self.player.update(self.keyboard)
+            self.UI.update()
 
             self.camera.move_x(1)
 
@@ -54,6 +61,32 @@ class Game:
             self.draw()
 
         pygame.quit()
+
+
+class Ui_Manager:
+    def __init__(self, game):
+        self.game = game
+        self.views = []
+
+        self.init()
+
+    def init(self):
+        self.views.append(EditText(pygame.Rect(100, 100, 200, 50), "Hello", 30, Colors.BLACK, self.game.mouse, self.game.keyboard))
+    def add_view(self, view):
+        self.views.append(view)
+
+    def update(self):
+        for view in self.views:
+            view.update()
+
+    def draw(self, screen):
+        for view in self.views:
+            view.draw(screen)
+
+    def remove_view(self, view):
+        self.views.remove(view)
+    def clear(self):
+        self.views.clear()
 
 
 class Camera:
@@ -92,8 +125,8 @@ class GameScroll:
 
 
 class Sprite:
-    def __init__(self, game_scroll, x, y, width, height):
-        self.game_scroll = game_scroll
+    def __init__(self, game_sroll, x, y, width, height):
+        self.game_scroll = game_sroll
 
         self.rect = pygame.Rect(x, y, width, height)
 
@@ -104,16 +137,18 @@ class Sprite:
 class Player(Sprite):
     def __init__(self, game_scroll, x, y, width, height):
         super().__init__(game_scroll, x, y, width, height)
+        self.lock_all_controls = False
 
     def update(self, keyboard):
-        if keyboard.is_key_down(pygame.K_a):
-            self.rect.x -= 5
-        if keyboard.is_key_down(pygame.K_d):
-            self.rect.x += 5
-        if keyboard.is_key_down(pygame.K_w):
-            self.rect.y -= 5
-        if keyboard.is_key_down(pygame.K_s):
-            self.rect.y += 5
+        if not self.lock_all_controls:
+            if keyboard.is_key_down(pygame.K_a):
+                self.rect.x -= 5
+            if keyboard.is_key_down(pygame.K_d):
+                self.rect.x += 5
+            if keyboard.is_key_down(pygame.K_w):
+                self.rect.y -= 5
+            if keyboard.is_key_down(pygame.K_s):
+                self.rect.y += 5
 
 
 if __name__ == "__main__":

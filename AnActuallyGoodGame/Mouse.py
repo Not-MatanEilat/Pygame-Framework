@@ -29,6 +29,10 @@ class Click:
         self.just_released = False
 
     def update(self, events):
+        if self.just_pressed:
+            self.just_pressed = False
+            self.holding = True
+
         for event in events:
             if event.type == MOUSEBUTTONDOWN and event.button == self.mouse_button_type:
                 self.holding = True
@@ -36,9 +40,7 @@ class Click:
             elif event.type == MOUSEBUTTONUP and event.button == self.mouse_button_type:
                 self.holding = False
                 self.just_released = True
-            else:
-                self.just_pressed = False
-                self.just_released = False
+
 
 class Scroll:
     def __init__(self):
