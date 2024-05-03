@@ -3,10 +3,12 @@ from pygame import draw
 from pygame import font
 import Colors
 import abc
+from Drawable import Drawable
 
 
-class View:
+class View(Drawable):
     def __init__(self, rect, mouse):
+        super().__init__()
         self.rect = rect
         self.mouse = mouse
         self.visible = True

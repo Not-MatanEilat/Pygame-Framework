@@ -1,11 +1,15 @@
 import pygame
 import Colors
+from AnActuallyGoodGame.Sprite import Sprite
 from Mouse import Mouse
 from Keyboard import Keyboard
 from UI import Button
 from UI import Image
 from UI import EditText
 from UI import Text
+import abc
+from MenuScreen import MenuScreen
+from Drawable import DrawManager
 
 
 
@@ -28,37 +32,13 @@ class Game:
         self.mouse = Mouse()
         self.keyboard = Keyboard()
         self.UI = Ui_Manager(self)
+        self.draw_manager = DrawManager.get_instance()
 
-        self.camera.follow(self.player)
 
-        self.test1 = Sprite(self.game_scroll, 1000, 100, 50, 50)
-        self.test2 = Sprite(self.game_scroll, 200, 200, 50, 50)
-
-    def draw(self):
-        self.screen.fill(self.BACKGROUND_COLOR)
-        self.player.draw(self.screen)
-        self.test1.draw(self.screen)
-        self.test2.draw(self.screen)
-        self.UI.draw(self.screen)
-        pygame.display.flip()
 
     def run(self):
-        while self.running:
-            self.clock.tick(self.FPS)
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.QUIT:
-                    self.running = False
-
-            self.mouse.update(events)
-            self.keyboard.update()
-            self.player.update(self.keyboard)
-            self.UI.update()
-
-            self.camera.move_x(1)
-
-            self.camera.update()
-            self.draw()
+        screen = MenuScreen(self)
+        screen.run()
 
         pygame.quit()
 
@@ -68,10 +48,7 @@ class Ui_Manager:
         self.game = game
         self.views = []
 
-        self.init()
 
-    def init(self):
-        self.views.append(EditText(pygame.Rect(100, 100, 200, 50), "Hello", 30, Colors.BLACK, self.game.mouse, self.game.keyboard))
     def add_view(self, view):
         self.views.append(view)
 
@@ -123,15 +100,6 @@ class GameScroll:
         self.x = 0
         self.y = 0
 
-
-class Sprite:
-    def __init__(self, game_sroll, x, y, width, height):
-        self.game_scroll = game_sroll
-
-        self.rect = pygame.Rect(x, y, width, height)
-
-    def draw(self, screen):
-        pygame.draw.rect(screen, Colors.RED, pygame.Rect(self.rect.x - self.game_scroll.x, self.rect.y - self.game_scroll.y, self.rect.width, self.rect.height))
 
 
 class Player(Sprite):
