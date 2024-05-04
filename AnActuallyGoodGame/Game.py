@@ -12,7 +12,6 @@ from MenuScreen import MenuScreen
 from Drawable import DrawManager
 
 
-
 pygame.init()
 
 
@@ -24,46 +23,45 @@ class Game:
 
     def __init__(self):
         self.screen = pygame.display.set_mode((Game.WIDTH, Game.HEIGHT))
+        self.current_screen = None
+        self.screens = []
         self.running = True
+        self.draw_manager = DrawManager(self.current_screen)
         self.clock = pygame.time.Clock()
         self.game_scroll = GameScroll()
         self.camera = Camera(self.game_scroll)
-        self.player = Player(self.game_scroll, 50, 50, 50, 50)
         self.mouse = Mouse()
         self.keyboard = Keyboard()
         self.UI = Ui_Manager(self)
-        self.draw_manager = DrawManager.get_instance()
 
 
 
     def run(self):
-        screen = MenuScreen(self)
-        screen.run()
-
+        self.current_screen = MenuScreen(self)
+        self.current_screen.start_screen(MenuScreen)
         pygame.quit()
 
 
 class Ui_Manager:
-    def __init__(self, game):
-        self.game = game
-        self.views = []
+    def __init__(self, current_screen):
+        self.current_screen = current_screen
 
 
     def add_view(self, view):
-        self.views.append(view)
+        self.current_screen.views.append(view)
 
     def update(self):
-        for view in self.views:
+        for view in self.current_screen.views:
             view.update()
 
     def draw(self, screen):
-        for view in self.views:
+        for view in self.current_screen.views:
             view.draw(screen)
 
     def remove_view(self, view):
-        self.views.remove(view)
+        self.current_screen.views.remove(view)
     def clear(self):
-        self.views.clear()
+        self.current_screen.views.clear()
 
 
 class Camera:
@@ -100,23 +98,6 @@ class GameScroll:
         self.x = 0
         self.y = 0
 
-
-
-class Player(Sprite):
-    def __init__(self, game_scroll, x, y, width, height):
-        super().__init__(game_scroll, x, y, width, height)
-        self.lock_all_controls = False
-
-    def update(self, keyboard):
-        if not self.lock_all_controls:
-            if keyboard.is_key_down(pygame.K_a):
-                self.rect.x -= 5
-            if keyboard.is_key_down(pygame.K_d):
-                self.rect.x += 5
-            if keyboard.is_key_down(pygame.K_w):
-                self.rect.y -= 5
-            if keyboard.is_key_down(pygame.K_s):
-                self.rect.y += 5
 
 
 if __name__ == "__main__":
